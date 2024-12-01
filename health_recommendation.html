@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保健品推薦系統</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result h2 {
+            color: #4CAF50;
+        }
+        .product-item {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .product-item a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .product-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>保健品推薦系統</h1>
+        <form id="recommendationForm">
+            <div class="form-group">
+                <label for="age">年齡:</label>
+                <input type="number" id="age" name="age" placeholder="請輸入您的年齡" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">性別:</label>
+                <select id="gender" name="gender" required>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="condition">健康狀況:</label>
+                <input type="text" id="condition" name="condition" placeholder="例如：關節疼痛、疲勞等" required>
+            </div>
+
+            <button type="submit">提交</button>
+        </form>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('recommendationForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const condition = document.getElementById('condition').value;
+
+            // 根據用戶輸入進行簡單的推薦邏輯
+            let recommendations = [];
+            if (age < 30) {
+                recommendations.push({ name: "維他命C", link: "https://example.com/vitamin-c", price: "$10" });
+            }
+            if (condition.includes("關節")) {
+                recommendations.push({ name: "Omega-3", link: "https://example.com/omega-3", price: "$20" });
+            }
+            if (condition.includes("疲勞")) {
+                recommendations.push({ name: "鐵劑", link: "https://example.com/iron", price: "$15" });
+            }
+
+            // 顯示推薦結果
+            let resultHtml = '<h2>推薦的保健品:</h2>';
+            if (recommendations.length > 0) {
+                recommendations.forEach(product => {
+                    resultHtml += `
+                        <div class="product-item">
+                            <a href="${product.link}" target="_blank">${product.name}</a><br>
+                            價格: ${product.price}
+                        </div>
+                    `;
+                });
+            } else {
+                resultHtml += '<p>根據您的輸入，沒有推薦的保健品。</p>';
+            }
+            document.getElementById('result').innerHTML = resultHtml;
+        });
+    </script>
+
+</body>
+</html>

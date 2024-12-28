@@ -32,6 +32,10 @@
             margin-bottom: 5px;
             display: block;
         }
+        .required {
+            color: red;
+            margin-left: 3px;
+        }
         input, select {
             width: 100%;
             padding: 10px;
@@ -88,12 +92,12 @@
         <form id="recommendationForm">
             <!-- 基本資料 -->
             <div class="form-group">
-                <label for="age">年齡:</label>
+                <label for="age">年齡<span class="required">*</span>:</label>
                 <input type="number" id="age" name="age" placeholder="請輸入您的年齡" required>
             </div>
 
             <div class="form-group">
-                <label for="gender">性別:</label>
+                <label for="gender">性別<span class="required">*</span>:</label>
                 <select id="gender" name="gender" required>
                     <option value="">請選擇</option>
                     <option value="male">男</option>
@@ -104,33 +108,34 @@
             <!-- BMI 計算相關欄位 -->
             <div class="form-group">
                 <label for="height">身高 (公分):</label>
-                <input type="number" id="height" name="height" placeholder="請輸入身高" required>
+                <input type="number" id="height" name="height" placeholder="請輸入身高">
             </div>
 
             <div class="form-group">
                 <label for="weight">體重 (公斤):</label>
-                <input type="number" id="weight" name="weight" placeholder="請輸入體重" required>
+                <input type="number" id="weight" name="weight" placeholder="請輸入體重">
             </div>
 
             <!-- 血壓 -->
             <div class="form-group">
                 <label>血壓 (mmHg):</label>
                 <div class="blood-pressure-group">
-                    <input type="number" id="systolic" name="systolic" placeholder="收縮壓" required>
-                    <input type="number" id="diastolic" name="diastolic" placeholder="舒張壓" required>
+                    <input type="number" id="systolic" name="systolic" placeholder="收縮壓">
+                    <input type="number" id="diastolic" name="diastolic" placeholder="舒張壓">
                 </div>
             </div>
 
             <!-- 血糖 -->
             <div class="form-group">
                 <label for="bloodSugar">血糖 (mg/dL):</label>
-                <input type="number" id="bloodSugar" name="bloodSugar" placeholder="請輸入血糖值" required>
+                <input type="number" id="bloodSugar" name="bloodSugar" placeholder="請輸入血糖值">
             </div>
 
             <!-- 疾病史 -->
             <div class="form-group">
-                <label for="diseases">是否有其他疾病:</label>
+                <label for="diseases">是否有其他疾病<span class="required">*</span>:</label>
                 <select id="diseases" name="diseases" required>
+                    <option value="">請選擇</option>
                     <option value="no">無</option>
                     <option value="diabetes">糖尿病</option>
                     <option value="hypertension">高血壓</option>
@@ -141,13 +146,13 @@
 
             <!-- 過敏史 -->
             <div class="form-group">
-                <label for="allergies">是否有過敏的藥物或食物:</label>
+                <label for="allergies">是否有過敏的藥物或食物<span class="required">*</span>:</label>
                 <input type="text" id="allergies" name="allergies" placeholder="請輸入過敏物品，若無請填'無'" required>
             </div>
 
             <!-- 健康需求 -->
             <div class="form-group">
-                <label for="healthNeeds">想了解的保健品項目與症狀:</label>
+                <label for="healthNeeds">想了解的保健品項目與症狀<span class="required">*</span>:</label>
                 <select id="healthNeeds" name="healthNeeds" required>
                     <option value="">請選擇</option>
                     <option value="bloodLipids">調節血脂</option>
@@ -181,31 +186,36 @@
             const formData = {
                 age: document.getElementById('age').value,
                 gender: document.getElementById('gender').value,
-                height: document.getElementById('height').value,
-                weight: document.getElementById('weight').value,
-                systolic: document.getElementById('systolic').value,
-                diastolic: document.getElementById('diastolic').value,
-                bloodSugar: document.getElementById('bloodSugar').value,
+                height: document.getElementById('height').value || null,
+                weight: document.getElementById('weight').value || null,
+                systolic: document.getElementById('systolic').value || null,
+                diastolic: document.getElementById('diastolic').value || null,
+                bloodSugar: document.getElementById('bloodSugar').value || null,
                 diseases: document.getElementById('diseases').value,
                 allergies: document.getElementById('allergies').value,
                 healthNeeds: document.getElementById('healthNeeds').value
             };
 
-            // 計算 BMI
-            const heightInMeters = formData.height / 100;
-            const bmi = (formData.weight / (heightInMeters * heightInMeters)).toFixed(1);
+            // 計算 BMI (只在有身高和體重時計算)
+            let bmi = null;
+            if (formData.height && formData.weight) {
+                const heightInMeters = formData.height / 100;
+                bmi = (formData.weight / (heightInMeters * heightInMeters)).toFixed(1);
+            }
 
             // 根據用戶輸入進行推薦邏輯
             let recommendations = [];
             
             // 基於 BMI 的推薦
-            if (bmi >= 24) {
+            if (bmi !== null && bmi >= 24) {
                 recommendations.push({ name: "膳食纖維補充品", link: "https://example.com/fiber", price: "$25" });
             }
 
             // 基於血壓的推薦
-            if (formData.systolic >= 140 || formData.diastolic >= 90) {
-                recommendations.push({ name: "魚油（Omega-3）", link: "https://example.com/omega3", price: "$30" });
+            if (formData.systolic && formData.diastolic) {
+                if (formData.systolic >= 140 || formData.diastolic >= 90) {
+                    recommendations.push({ name: "魚油（Omega-3）", link: "https://example.com/omega3", price: "$30" });
+                }
             }
 
             // 基於健康需求的推薦
@@ -226,9 +236,9 @@
             let resultHtml = `
                 <h2>身體數據分析:</h2>
                 <div class="product-item">
-                    <p>BMI: ${bmi}</p>
-                    <p>血壓: ${formData.systolic}/${formData.diastolic} mmHg</p>
-                    <p>血糖: ${formData.bloodSugar} mg/dL</p>
+                    ${bmi ? `<p>BMI: ${bmi}</p>` : ''}
+                    ${formData.systolic && formData.diastolic ? `<p>血壓: ${formData.systolic}/${formData.diastolic} mmHg</p>` : ''}
+                    ${formData.bloodSugar ? `<p>血糖: ${formData.bloodSugar} mg/dL</p>` : ''}
                 </div>
                 <h2>推薦的保健品:</h2>
             `;

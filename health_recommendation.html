@@ -39,6 +39,13 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        .blood-pressure-group {
+            display: flex;
+            gap: 10px;
+        }
+        .blood-pressure-group input {
+            width: calc(50% - 5px);
+        }
         button {
             background-color: #4CAF50;
             color: white;
@@ -48,6 +55,7 @@
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #45a049;
@@ -75,10 +83,10 @@
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>保健品推薦系統</h1>
         <form id="recommendationForm">
+            <!-- 基本資料 -->
             <div class="form-group">
                 <label for="age">年齡:</label>
                 <input type="number" id="age" name="age" placeholder="請輸入您的年齡" required>
@@ -87,14 +95,76 @@
             <div class="form-group">
                 <label for="gender">性別:</label>
                 <select id="gender" name="gender" required>
+                    <option value="">請選擇</option>
                     <option value="male">男</option>
                     <option value="female">女</option>
                 </select>
             </div>
 
+            <!-- BMI 計算相關欄位 -->
             <div class="form-group">
-                <label for="condition">健康狀況:</label>
-                <input type="text" id="condition" name="condition" placeholder="例如：關節疼痛、疲勞等" required>
+                <label for="height">身高 (公分):</label>
+                <input type="number" id="height" name="height" placeholder="請輸入身高" required>
+            </div>
+
+            <div class="form-group">
+                <label for="weight">體重 (公斤):</label>
+                <input type="number" id="weight" name="weight" placeholder="請輸入體重" required>
+            </div>
+
+            <!-- 血壓 -->
+            <div class="form-group">
+                <label>血壓 (mmHg):</label>
+                <div class="blood-pressure-group">
+                    <input type="number" id="systolic" name="systolic" placeholder="收縮壓" required>
+                    <input type="number" id="diastolic" name="diastolic" placeholder="舒張壓" required>
+                </div>
+            </div>
+
+            <!-- 血糖 -->
+            <div class="form-group">
+                <label for="bloodSugar">血糖 (mg/dL):</label>
+                <input type="number" id="bloodSugar" name="bloodSugar" placeholder="請輸入血糖值" required>
+            </div>
+
+            <!-- 疾病史 -->
+            <div class="form-group">
+                <label for="diseases">是否有其他疾病:</label>
+                <select id="diseases" name="diseases" required>
+                    <option value="no">無</option>
+                    <option value="diabetes">糖尿病</option>
+                    <option value="hypertension">高血壓</option>
+                    <option value="heartDisease">心臟病</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+
+            <!-- 過敏史 -->
+            <div class="form-group">
+                <label for="allergies">是否有過敏的藥物或食物:</label>
+                <input type="text" id="allergies" name="allergies" placeholder="請輸入過敏物品，若無請填'無'" required>
+            </div>
+
+            <!-- 健康需求 -->
+            <div class="form-group">
+                <label for="healthNeeds">想了解的保健品項目與症狀:</label>
+                <select id="healthNeeds" name="healthNeeds" required>
+                    <option value="">請選擇</option>
+                    <option value="bloodLipids">調節血脂</option>
+                    <option value="digestive">胃腸功能改善</option>
+                    <option value="liver">護肝</option>
+                    <option value="immune">免疫調節</option>
+                    <option value="bone">骨質保健</option>
+                    <option value="fatPrevention">不易形成體脂肪</option>
+                    <option value="antiFatigue">抗疲勞</option>
+                    <option value="allergy">輔助調整過敏體質</option>
+                    <option value="bloodSugar">調節血糖</option>
+                    <option value="antiAging">延緩衰老</option>
+                    <option value="dental">牙齒保健</option>
+                    <option value="iron">促進鐵吸收</option>
+                    <option value="bloodPressure">輔助調節血壓</option>
+                    <option value="none">無</option>
+                </select>
             </div>
 
             <button type="submit">提交</button>
@@ -107,24 +177,62 @@
         document.getElementById('recommendationForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const age = document.getElementById('age').value;
-            const gender = document.getElementById('gender').value;
-            const condition = document.getElementById('condition').value;
+            // 獲取表單數據
+            const formData = {
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                height: document.getElementById('height').value,
+                weight: document.getElementById('weight').value,
+                systolic: document.getElementById('systolic').value,
+                diastolic: document.getElementById('diastolic').value,
+                bloodSugar: document.getElementById('bloodSugar').value,
+                diseases: document.getElementById('diseases').value,
+                allergies: document.getElementById('allergies').value,
+                healthNeeds: document.getElementById('healthNeeds').value
+            };
 
-            // 根據用戶輸入進行簡單的推薦邏輯
+            // 計算 BMI
+            const heightInMeters = formData.height / 100;
+            const bmi = (formData.weight / (heightInMeters * heightInMeters)).toFixed(1);
+
+            // 根據用戶輸入進行推薦邏輯
             let recommendations = [];
-            if (age < 30) {
-                recommendations.push({ name: "維他命C", link: "https://example.com/vitamin-c", price: "$10" });
+            
+            // 基於 BMI 的推薦
+            if (bmi >= 24) {
+                recommendations.push({ name: "膳食纖維補充品", link: "https://example.com/fiber", price: "$25" });
             }
-            if (condition.includes("關節")) {
-                recommendations.push({ name: "Omega-3", link: "https://example.com/omega-3", price: "$20" });
+
+            // 基於血壓的推薦
+            if (formData.systolic >= 140 || formData.diastolic >= 90) {
+                recommendations.push({ name: "魚油（Omega-3）", link: "https://example.com/omega3", price: "$30" });
             }
-            if (condition.includes("疲勞")) {
-                recommendations.push({ name: "鐵劑", link: "https://example.com/iron", price: "$15" });
+
+            // 基於健康需求的推薦
+            switch(formData.healthNeeds) {
+                case 'bloodLipids':
+                    recommendations.push({ name: "紅麴", link: "https://example.com/red-yeast", price: "$35" });
+                    break;
+                case 'digestive':
+                    recommendations.push({ name: "益生菌", link: "https://example.com/probiotics", price: "$28" });
+                    break;
+                case 'liver':
+                    recommendations.push({ name: "薑黃素", link: "https://example.com/turmeric", price: "$32" });
+                    break;
+                // ... 其他健康需求的推薦邏輯
             }
 
             // 顯示推薦結果
-            let resultHtml = '<h2>推薦的保健品:</h2>';
+            let resultHtml = `
+                <h2>身體數據分析:</h2>
+                <div class="product-item">
+                    <p>BMI: ${bmi}</p>
+                    <p>血壓: ${formData.systolic}/${formData.diastolic} mmHg</p>
+                    <p>血糖: ${formData.bloodSugar} mg/dL</p>
+                </div>
+                <h2>推薦的保健品:</h2>
+            `;
+
             if (recommendations.length > 0) {
                 recommendations.forEach(product => {
                     resultHtml += `
@@ -135,11 +243,11 @@
                     `;
                 });
             } else {
-                resultHtml += '<p>根據您的輸入，沒有推薦的保健品。</p>';
+                resultHtml += '<p>根據您的輸入，沒有特別需要補充的保健品。建議維持均衡飲食和規律運動。</p>';
             }
+
             document.getElementById('result').innerHTML = resultHtml;
         });
     </script>
-
 </body>
 </html>
